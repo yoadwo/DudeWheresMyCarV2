@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG_main = "DUDE_main";
 
@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.d(TAG_main, "onCreate: ");
-        mDrawerLayout = findViewById(R.id.main_drawer_layout);
 
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
@@ -33,9 +32,19 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG_main, "onCreate: " + "getSupportActionBar return null");
         }
 
+        mDrawerLayout = findViewById(R.id.main_drawer_layout);
+
         NavigationView navigationView = findViewById(R.id.main_nav_view);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
+        navigationView.setNavigationItemSelectedListener(this);
+
+        if (savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
+                    new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
+        }
+
+
+        /*new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         // set item as selected to persist highlight
@@ -48,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
                         return true;
                     }
-                });
+                }*/
+
 
     }
 
@@ -63,5 +73,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // set item as selected to persist highlight
+        item.setChecked(true);
+        // close drawer when item is tapped
 
+
+        switch (item.getItemId()){
+            case R.id.nav_home:
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
+                        new HomeFragment()).commit();
+                break;
+            case R.id.nav_photo:
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
+                        new CameraFragment()).commit();
+                break;
+            case R.id.nav_navigation:
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
+                        new NavigationFragment()).commit();
+                break;
+        }
+        mDrawerLayout.closeDrawers();
+        return true;
+    }
 }

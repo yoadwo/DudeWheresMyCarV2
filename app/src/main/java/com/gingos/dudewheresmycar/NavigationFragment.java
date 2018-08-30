@@ -9,14 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class CameraFragment extends Fragment {
+public class NavigationFragment extends Fragment {
 
-    private static final String TAG_camera = "DUDE_camera";
+    private static final String TAG_navigation = "DUDE_navigation";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG_camera, "onCreateView: ");
-        return inflater.inflate(R.layout.fragment_camera, container, false);
+        Log.d(TAG_navigation, "onCreateView: ");
+        return inflater.inflate(R.layout.fragment_navigation, container, false);
     }
 }

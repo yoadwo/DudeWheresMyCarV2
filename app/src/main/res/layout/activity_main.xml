@@ -14,13 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/txt_stub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:text="@string/main_txt_stub"
-            android:textSize="30sp" />
     </FrameLayout>
 
     <!-- Container for contents of drawer - use NavigationView to make configuration easier -->

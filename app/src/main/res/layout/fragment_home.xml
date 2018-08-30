@@ -5,12 +5,12 @@
     >
 
     <TextView
-        android:id="@+id/tv_navigation_stub"
+        android:id="@+id/tv_home_stub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:text="@string/navigation_txt_stub"
-        android:textSize="30sp"/>
+        android:text="@string/home_txt_stub"
+        android:textSize="30sp" />
 
 </RelativeLayout>
