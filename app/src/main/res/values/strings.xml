@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Dude, Where\'s My Car?</string>
+    <string name="drawer_home">Home</string>
+    <string name="drawer_photo">Take A Photo!</string>
+    <string name="drawer_navigation">GPS Navigation</string>
+    <string name="drawer_header">Choose Action!</string>
+    <string name="main_txt_stub">Main Activity</string>
+    <string name="camera_txt_stub">Camera Fragment</string>
+    <string name="navigation_txt_stub">Navigation Fragment</string>
 </resources>

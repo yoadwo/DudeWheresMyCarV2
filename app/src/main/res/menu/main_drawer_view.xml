@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/drawer_home" />
+        <item
+            android:id="@+id/nav_photo"
+            android:icon="@drawable/ic_add_a_photo_black_24dp"
+            android:title="@string/drawer_photo" />
+        <item
+            android:id="@+id/nav_navigation"
+            android:icon="@drawable/ic_gps_fixed_black_24dp"
+            android:title="@string/drawer_navigation" />
+    </group>
+
+
+</menu>
