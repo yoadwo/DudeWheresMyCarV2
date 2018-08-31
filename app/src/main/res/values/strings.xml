@@ -7,5 +7,7 @@
     <string name="home_txt_stub">Main Fragment</string>
     <string name="camera_txt_stub">Camera Fragment</string>
     <string name="navigation_txt_stub">Navigation Fragment</string>
+    <string name="camera_container_description">container for car photos</string>
+    <string name="camera_button_description">button for taking photos</string>
 
 </resources>

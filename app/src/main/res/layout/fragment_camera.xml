@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -12,5 +14,24 @@
         android:layout_alignParentEnd="true"
         android:text="@string/camera_txt_stub"
         android:textSize="30sp" />
+
+    <ImageView
+        android:id="@+id/imgv_camera_container"
+        android:layout_width="232dp"
+        android:layout_height="336dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="90dp"
+        android:background="@android:color/darker_gray"
+        android:contentDescription="@string/camera_container_description" />
+
+    <ImageButton
+        android:id="@+id/imgb_camera_use"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/imgv_camera_container"
+        android:contentDescription="@string/camera_button_description"
+        app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
 
 </RelativeLayout>
