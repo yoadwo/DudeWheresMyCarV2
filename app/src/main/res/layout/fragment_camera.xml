@@ -17,13 +17,13 @@
 
     <ImageView
         android:id="@+id/imgv_camera_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="196dp"
+        android:layout_height="313dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
-        android:background="@android:drawable/ic_input_add"
-        android:contentDescription="@string/camera_thumbnail_description" />
+        android:contentDescription="@string/camera_thumbnail_description"
+        android:src="@android:drawable/ic_input_add" />
 
     <ImageButton
         android:id="@+id/imgb_camera_use"

@@ -21,12 +21,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout mDrawerLayout;
 
-    /*
-    //TODO:
-     1. calling hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY). If a camera is not available,
-        you should then disable your camera features.
-     2.
-     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_photo:
                 PackageManager packageManager = getPackageManager();
-                if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) == false){
+                // do not let user enter the camera fragment if he has not camera
+                if(!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
                     Toast.makeText(MainActivity.this,"This device does not have a camera.", Toast.LENGTH_SHORT).show();
                     break;
                 }

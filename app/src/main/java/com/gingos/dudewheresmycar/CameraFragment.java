@@ -1,8 +1,10 @@
 package com.gingos.dudewheresmycar;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,13 +82,13 @@ public class CameraFragment extends Fragment {
             switch (resultCode) {
                 case RESULT_OK:
                     Log.d(TAG_camera, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_OK");
-
-                    //TODO:
+                    // not using @param data. It is null, because intent was sent with extras
                     /*
-                    1. imageview should have a default starting size, but change dynamically after photo taken
-                    2. image quality is very low for some reason
-                     */
+                    TODO:
+                    1. thumbnail will a default size, which will change after a photo was taken
+                    */
                     setPic();
+                    galleryAddPic();
                     break;
                 case RESULT_CANCELED:
                     Log.d(TAG_camera, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_CANCELED");
@@ -118,6 +121,10 @@ public class CameraFragment extends Fragment {
                         Uri photoURI = FileProvider.getUriForFile(activityContext,
                                 getString(R.string.uri_provider),
                                 photoFile);
+                        /*
+                         NOTE! sending intents with EXTRA_OUTPUT means that its data
+                            will be null in OnActivityResult
+                          */
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                     }
@@ -132,7 +139,6 @@ public class CameraFragment extends Fragment {
 
     /*
     create image on phone disk, format: JPEG_<date>_.jpeg
-    TODO: create in folder DudeApp
     */
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -172,6 +178,7 @@ public class CameraFragment extends Fragment {
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         imgv_camera_thumbnail.setImageBitmap(bitmap);
+
     }
 
     /*
@@ -201,6 +208,18 @@ public class CameraFragment extends Fragment {
         }
 
         return inSampleSize;
+    }
+
+    private void galleryAddPic() {
+        //TODO: create in folder DudeApp
+        // NOT WORKING
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+
+        String path = contentUri.getPath(), fileName = contentUri.getLastPathSegment();
+
+
+
     }
 
 
