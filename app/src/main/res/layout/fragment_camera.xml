@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frag_camera"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_camera_stub"
@@ -16,21 +16,21 @@
         android:textSize="30sp" />
 
     <ImageView
-        android:id="@+id/imgv_camera_container"
-        android:layout_width="232dp"
-        android:layout_height="336dp"
+        android:id="@+id/imgv_camera_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
-        android:background="@android:color/darker_gray"
-        android:contentDescription="@string/camera_container_description" />
+        android:background="@android:drawable/ic_input_add"
+        android:contentDescription="@string/camera_thumbnail_description" />
 
     <ImageButton
         android:id="@+id/imgb_camera_use"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/imgv_camera_container"
+        android:layout_alignTop="@+id/imgv_camera_thumbnail"
         android:contentDescription="@string/camera_button_description"
         app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
 
