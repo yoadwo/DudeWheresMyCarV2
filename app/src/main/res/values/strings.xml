@@ -8,7 +8,8 @@
     <string name="camera_txt_stub">Camera Fragment</string>
     <string name="navigation_txt_stub">Navigation Fragment</string>
     <string name="camera_thumbnail_description">container for car photos</string>
-    <string name="camera_button_description">button for taking photos</string>
+    <string name="camera_button_photo_description">button for taking photos</string>
+    <string name="camera_button_share_description">button for sharing photos</string>
     <string name="album_dir">DudeApp</string>
     <string name="uri_provider">com.gingos.dudewheresmycar.fileprovider</string>
 

@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         mDrawerLayout.closeDrawers();
+
         return true;
     }
 
