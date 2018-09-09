@@ -1,10 +1,9 @@
 package com.gingos.dudewheresmycar;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,7 +15,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG_main = "DUDE_main";
+    private static final String TAG = "DUDE_main";
 
 
     private DrawerLayout mDrawerLayout;
@@ -27,22 +26,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d(TAG_main, "onCreate: ");
+        Log.d(TAG, "onCreate: ");
+        if (savedInstanceState != null)
+            Log.d(TAG, "KEY: " + savedInstanceState.getString("test-key"));
 
+        // set views
+        // draw action bar (when using drawer navigation, usually use a theme with no default action bar)
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         } else {
-            Log.d(TAG_main, "onCreate: " + "getSupportActionBar return null");
+            Log.d(TAG, "onCreate: " + "getSupportActionBar return null");
         }
-
+        // set drawer navigation view
         mDrawerLayout = findViewById(R.id.main_drawer_layout);
-
+        // set drawer listener
         NavigationView navigationView = findViewById(R.id.main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // default fragment is the home fragment
+        // set default fragment is the home fragment
         if (savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
                     new HomeFragment()).commit();
@@ -51,9 +54,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart: ");
+    }
+/*
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "onRestoreInstanceState: ");
+        super.onRestoreInstanceState(savedInstanceState);
+
+    }
+*/
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+/*    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // saves image currently on bitmap
+        Log.d(TAG, "onSaveInstanceState: ");
+    }*/
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: ");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
+
     /*
-    open the drawer animation
-     */
+                    open the drawer animation
+                     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

@@ -33,7 +33,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class CameraFragment extends Fragment {
 
-    private static final String TAG_camera = "DUDE_camera";
+    private static final String TAG = "DUDE_camera";
 
     public static final int REQUEST_IMAGE_CAPTURE = 10;
     private static final int STORAGE_PERMISSION_CODE = 21;
@@ -44,15 +44,14 @@ public class CameraFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG_camera, "onActivityCreated: ");
-        imgv_camera_thumbnail = null;
+        Log.d(TAG, "onActivityCreated: ");
         mCurrentPhotoPath = null;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG_camera, "onCreateView: ");
+        Log.d(TAG, "onCreateView: ");
         return inflater.inflate(R.layout.fragment_camera, container, false);
     }
 
@@ -66,13 +65,13 @@ public class CameraFragment extends Fragment {
         if (bt_camera_use !=null){
             bt_camera_use.setOnClickListener(takePhotoListener);
         } else
-            Log.d(TAG_camera, "onViewCreated: " + "bt_camera_use is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_use is null");
 
         ImageButton bt_camera_share = getView().findViewById(R.id.imgb_camera_share);
         if (bt_camera_share !=null){
             bt_camera_share.setOnClickListener(sharePhotoListener);
         } else
-            Log.d(TAG_camera, "onViewCreated: " + "bt_camera_share is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_share is null");
 
         // set camera container imageview
         imgv_camera_thumbnail = getView().findViewById(R.id.imgv_camera_thumbnail);
@@ -81,7 +80,7 @@ public class CameraFragment extends Fragment {
     private View.OnClickListener takePhotoListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.v(TAG_camera, "onClick: " + "camera take button clicked");
+            Log.v(TAG, "onClick: " + "camera take button clicked");
             dispatchTakePictureIntent();
                     /*
                     app versioning needed (minSDK is 21
@@ -96,7 +95,7 @@ public class CameraFragment extends Fragment {
     private View.OnClickListener sharePhotoListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.v(TAG_camera, "onClick: " + "camera take button clicked");
+            Log.v(TAG, "onClick: " + "camera take button clicked");
             dispatchSharePictureIntent();
         }
     };
@@ -105,12 +104,12 @@ public class CameraFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.v(TAG_camera, "onActivityResult: ");
+        Log.v(TAG, "onActivityResult: ");
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            Log.d(TAG_camera, "onActivityResult: " + "REQUEST_IMAGE_CAPTURE");
+            Log.d(TAG, "onActivityResult: " + "REQUEST_IMAGE_CAPTURE");
             switch (resultCode) {
                 case RESULT_OK:
-                    Log.d(TAG_camera, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_OK");
+                    Log.d(TAG, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_OK");
                     // not using @param data. It is null, because intent was sent with extras
                     /*
                     TODO:
@@ -120,7 +119,7 @@ public class CameraFragment extends Fragment {
                     galleryAddPic();
                     break;
                 case RESULT_CANCELED:
-                    Log.d(TAG_camera, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_CANCELED");
+                    Log.d(TAG, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_CANCELED");
                     mCurrentPhotoPath = null;
                     deleteTempFiles(getContext().getCacheDir());
 
@@ -146,11 +145,11 @@ public class CameraFragment extends Fragment {
             //If permission is granted
             if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 //Displaying a toast
-                Log.d(TAG_camera, "onRequestPermissionsResult: " + "granted");
+                Log.d(TAG, "onRequestPermissionsResult: " + "granted");
                 Toast.makeText(getContext(),"Permission granted now you can write to the storage",Toast.LENGTH_LONG).show();
             }else{
                 //Displaying another toast if permission is not granted
-                Log.d(TAG_camera, "onRequestPermissionsResult: " + "denied");
+                Log.d(TAG, "onRequestPermissionsResult: " + "denied");
                 Toast.makeText(getContext(),"Oops you just denied the permission",Toast.LENGTH_LONG).show();
             }
         }
@@ -180,7 +179,7 @@ public class CameraFragment extends Fragment {
     }
 
     private void dispatchTakePictureIntent() {
-        Log.v(TAG_camera, "dispatchTakePictureIntent: ");
+        Log.v(TAG, "dispatchTakePictureIntent: ");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //Return the Activity this fragment is currently associated with.
         android.content.Context activityContext = getActivity();
@@ -193,7 +192,7 @@ public class CameraFragment extends Fragment {
                         photoFile = createImageFile();
                     } catch (IOException ex) {
                         Toast.makeText(activityContext, "Could not create file on disk", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG_camera, "dispatchTakePictureIntent: ", ex);
+                        Log.e(TAG, "dispatchTakePictureIntent: ", ex);
                         return;
                     }
                     // Continue only if the File was successfully created
@@ -221,13 +220,13 @@ public class CameraFragment extends Fragment {
     private void dispatchSharePictureIntent(){
         if (mCurrentPhotoPath == null) {
             Toast.makeText(getContext(), "Take Photo First", Toast.LENGTH_SHORT).show();
-            Log.d(TAG_camera, "dispatchSharePictureIntent: " + "mCurrentPhotoPath is null");
+            Log.d(TAG, "dispatchSharePictureIntent: " + "mCurrentPhotoPath is null");
         }
         else{
             Intent sharePhotoIntent = new Intent(Intent.ACTION_SEND);
             sharePhotoIntent.setType("image/jpg");
             sharePhotoIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(mCurrentPhotoPath));
-            Log.d(TAG_camera, "dispatchSharePictureIntent: " + "dispatching...");
+            Log.d(TAG, "dispatchSharePictureIntent: " + "dispatching...");
             startActivity(Intent.createChooser(sharePhotoIntent, "Share Image Using"));
 
         }
@@ -269,25 +268,25 @@ public class CameraFragment extends Fragment {
             if (storageDir != null) {
 
                 if (!storageDir.exists()) {
-                    Log.d(TAG_camera, "getStorageDir: " + "dir does not exist, trying to create..");
+                    Log.d(TAG, "getStorageDir: " + "dir does not exist, trying to create..");
                     if (!storageDir.mkdir()) {
-                        Log.d(TAG_camera, "getStorageDir: " + "failed to create dir");
+                        Log.d(TAG, "getStorageDir: " + "failed to create dir");
                         success = false;
                     } else {
-                        Log.d(TAG_camera, "getStorageDir: " + "DIR CREATED!");
+                        Log.d(TAG, "getStorageDir: " + "DIR CREATED!");
                     }
                 } else {
-                    Log.d(TAG_camera, "getStorageDir: " + "dir exists");
+                    Log.d(TAG, "getStorageDir: " + "dir exists");
                 }
 
             } else {
-                Log.d(TAG_camera, "getStorageDir: " + "failed to get DIRECTORY_PICTURES");
+                Log.d(TAG, "getStorageDir: " + "failed to get DIRECTORY_PICTURES");
                 success = false;
 
             }
 
         } else {
-            Log.w(TAG_camera,"getStorageDir: " + "getExternalStorage mounted state is false, using getExternalFilesDir instead");
+            Log.w(TAG,"getStorageDir: " + "getExternalStorage mounted state is false, using getExternalFilesDir instead");
             success = false;
         }
 
