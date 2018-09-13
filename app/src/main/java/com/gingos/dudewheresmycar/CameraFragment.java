@@ -1,6 +1,7 @@
 package com.gingos.dudewheresmycar;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
@@ -42,12 +44,26 @@ public class CameraFragment extends Fragment {
     private ImageView imgv_camera_thumbnail;
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "onAttach: ");
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated: ");
-        mCurrentPhotoPath = null;
     }
 
+    /*
+    Inflate the view scheme
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,6 +71,9 @@ public class CameraFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_camera, container, false);
     }
 
+    /*
+    always use findViewById in onViewCreated(when view is fully created)
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -73,8 +92,34 @@ public class CameraFragment extends Fragment {
         } else
             Log.d(TAG, "onViewCreated: " + "bt_camera_share is null");
 
+        ImageButton bt_camera_clear = getView().findViewById(R.id.imgb_camera_clear);
+        if (bt_camera_clear !=null){
+            bt_camera_clear.setOnClickListener(clearPhotoListener);
+        } else
+            Log.d(TAG, "onViewCreated: " + "bt_camera_clear is null");
+
+        ImageButton bt_camera_restore = getView().findViewById(R.id.imgb_camera_restore);
+        if (bt_camera_restore !=null){
+            bt_camera_restore.setOnClickListener(restorePhotoListener);
+        } else
+            Log.d(TAG, "onViewCreated: " + "bt_camera_restore is null");
+
         // set camera container imageview
         imgv_camera_thumbnail = getView().findViewById(R.id.imgv_camera_thumbnail);
+
+        Log.d(TAG, "onViewCreated: ");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: " + "mCurrentPhotoPath:" + mCurrentPhotoPath);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
     }
 
     private View.OnClickListener takePhotoListener = new View.OnClickListener() {
@@ -82,13 +127,22 @@ public class CameraFragment extends Fragment {
         public void onClick(View v) {
             Log.v(TAG, "onClick: " + "camera take button clicked");
             dispatchTakePictureIntent();
-                    /*
-                    app versioning needed (minSDK is 21
-                    if(isWriteStorageAllowed())
-                        dispatchTakePictureIntent();
-                    else
-                        requestWriteStoragePermission();
-                    */
+            /*
+            app versioning needed (minSDK is 21
+            if(isWriteStorageAllowed())
+                dispatchTakePictureIntent();
+            else
+                requestWriteStoragePermission();
+            */
+        }
+    };
+
+    private View.OnClickListener clearPhotoListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.v(TAG, "onClick: " + "camera clear button clicked");
+            mCurrentPhotoPath = null;
+            imgv_camera_thumbnail.setImageResource(R.drawable.ic_all_out_black_24dp);
         }
     };
 
@@ -100,6 +154,47 @@ public class CameraFragment extends Fragment {
         }
     };
 
+    private View.OnClickListener restorePhotoListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "onClick: " + "camera restore button clicked");
+            setCameraThumbnail();
+        }
+    };
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        savePhotoState();
+        Log.d(TAG, "onStop: " + "mCurrentPhotoPath:" + mCurrentPhotoPath);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView: ");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "onDetach: ");
+    }
+
+    //
+    //
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -115,25 +210,20 @@ public class CameraFragment extends Fragment {
                     TODO:
                     1. thumbnail will a default size, which will change after a photo was taken
                     */
+                    // update thumbnail with taken photo
                     setPic();
+                    // add photo to public gallery folder
                     galleryAddPic();
                     break;
                 case RESULT_CANCELED:
                     Log.d(TAG, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_CANCELED");
                     mCurrentPhotoPath = null;
                     deleteTempFiles(getContext().getCacheDir());
-
-                    /*
-                    TODO:
-                    1. delete temp file
-                     */
                     break;
 
             }
         }
     }
-
-
 
     //This method will be called when the user will tap on allow or deny
     @Override
@@ -178,6 +268,8 @@ public class CameraFragment extends Fragment {
 
     }
 
+    // called when Take button is pressed
+
     private void dispatchTakePictureIntent() {
         Log.v(TAG, "dispatchTakePictureIntent: ");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -217,6 +309,8 @@ public class CameraFragment extends Fragment {
 
     }
 
+    // called when Share button is pressed
+
     private void dispatchSharePictureIntent(){
         if (mCurrentPhotoPath == null) {
             Toast.makeText(getContext(), "Take Photo First", Toast.LENGTH_SHORT).show();
@@ -228,13 +322,44 @@ public class CameraFragment extends Fragment {
             sharePhotoIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(mCurrentPhotoPath));
             Log.d(TAG, "dispatchSharePictureIntent: " + "dispatching...");
             startActivity(Intent.createChooser(sharePhotoIntent, "Share Image Using"));
-
         }
 
     }
-    /*
-    create image on phone disk, format: JPEG_<date>_.jpeg
-    */
+
+    // attempt to restore last photo taken into thumbnail
+    // assumes mCurrentPhotoPath is null
+    // looks in the PhotoStateManager class for recent photo entry
+
+    private void setCameraThumbnail() {
+        // init photoStateManager instance
+        PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getActivity());
+        // no photo was saved when app was started
+        if (mCurrentPhotoPath == null){
+            Log.d(TAG, "setCameraThumbnail: " + "mCurrentPhotoPath is null");
+            String loadedPath = photoStateManager.loadPhotoState();
+            if (loadedPath != null){
+                // restore last photo used
+                mCurrentPhotoPath = loadedPath;
+                setPic();
+            } else {
+                Log.d(TAG, "setCameraThumbnail: " + "no path saved on photoStateManager");
+                Toast.makeText(getContext(),"No photo saved for app",Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.d(TAG, "setCameraThumbnail: " + "mCurrentPhotoPath is not null");
+            promptThumbnailReplace();
+            Toast.makeText(getContext(),"Are you sure you want to replace current photo?",Toast.LENGTH_SHORT).show();
+            //setPic();
+        }
+
+    }
+
+    private void promptThumbnailReplace() {
+    }
+
+
+    //create image on phone disk, format: JPEG_<date>_.jpeg
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
@@ -252,11 +377,11 @@ public class CameraFragment extends Fragment {
         return image;
     }
 
-    /*
-    get directory path for storing the photos
-    at the moment, app couldn't get WRITE permissions, hence storage.mkdir() @ getExternalStoragePublicDirectory fails
-    so photos are saved privately at getExternalFilesDir (pictures)
-     */
+
+    // get directory path for storing the photos
+    // at the moment, app couldn't get WRITE permissions, hence storage.mkdir() @ getExternalStoragePublicDirectory fails
+    // so photos are saved privately at getExternalFilesDir (pictures)
+
     private File getStorageDir() {
         File storageDir = null;
         boolean success = true;
@@ -296,6 +421,9 @@ public class CameraFragment extends Fragment {
 
     }
 
+    // used to decode mCurrentPhotoPath into imageview thumbail
+    // assumes mCurrentPhotoPath has some path value
+
     private void setPic() {
         // Get the dimensions of the View
         int targetW = imgv_camera_thumbnail.getWidth();
@@ -321,18 +449,20 @@ public class CameraFragment extends Fragment {
 
     }
 
-    /*
-    A more efficient way of presenting the bitmap
-    loads a scaled down version into memory
-    taken from https://developer.android.com/topic/performance/graphics/load-bitmap
-    use in case of OutOfMemory exception
-     */
-    public static int calculateInSampleSize(
+
+    // A more efficient way of presenting the bitmap
+    // loads a scaled down version into memory
+    // taken from https://developer.android.com/topic/performance/graphics/load-bitmap
+     // use in case of OutOfMemory exception
+
+    public int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
+
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
+
 
         if (height > reqHeight || width > reqWidth) {
 
@@ -360,6 +490,8 @@ public class CameraFragment extends Fragment {
 
     }
 
+    // recursively delete temp files in folder
+    // needed when user cancels camera (file is created prior to camera successful return)
     private boolean deleteTempFiles(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -376,8 +508,12 @@ public class CameraFragment extends Fragment {
         return file.delete();
     }
 
-
-
+    private void savePhotoState(){
+        PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getActivity());
+        // mCurrentPhotoPath could be null, but that's a waste of resources to save it anyway
+        if (mCurrentPhotoPath != null)
+            photoStateManager.savePhotoState(mCurrentPhotoPath);
+    }
 
 
 }

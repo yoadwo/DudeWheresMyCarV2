@@ -10,6 +10,8 @@
     <string name="camera_thumbnail_description">container for car photos</string>
     <string name="camera_button_photo_description">button for taking photos</string>
     <string name="camera_button_share_description">button for sharing photos</string>
+    <string name="camera_button_clear_description">button for clearing current photo</string>
+    <string name="camera_button_restore_description">button for restoring last taken photo</string>
     <string name="album_dir">DudeApp</string>
     <string name="uri_provider">com.gingos.dudewheresmycar.fileprovider</string>
 

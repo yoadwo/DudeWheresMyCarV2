@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frag_camera"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -16,13 +17,13 @@
 
     <ImageView
         android:id="@+id/imgv_camera_thumbnail"
-        android:layout_width="337dp"
-        android:layout_height="249dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
         android:contentDescription="@string/camera_thumbnail_description"
-        android:src="@android:drawable/ic_input_add" />
+        android:src="@drawable/ic_all_out_black_24dp" />
 
     <ImageButton
         android:id="@+id/imgb_camera_use"
@@ -41,6 +42,26 @@
         android:layout_alignStart="@+id/imgv_camera_thumbnail"
         android:layout_alignTop="@+id/imgb_camera_use"
         android:contentDescription="@string/camera_button_share_description"
-        app:srcCompat="@android:drawable/ic_menu_share" />
+        app:srcCompat="@drawable/ic_share_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/imgb_camera_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/imgb_camera_use"
+        android:layout_marginStart="121dp"
+        android:contentDescription="@string/camera_button_clear_description"
+        app:srcCompat="@drawable/ic_delete_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/imgb_camera_restore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/imgb_camera_use"
+        android:layout_marginEnd="101dp"
+        android:contentDescription="@string/camera_button_restore_description"
+        app:srcCompat="@drawable/ic_restore_black_24dp" />
 
 </RelativeLayout>

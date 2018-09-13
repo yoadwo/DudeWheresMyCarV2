@@ -34,6 +34,12 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated: ");
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated: ");
@@ -74,6 +80,7 @@ public class HomeFragment extends Fragment {
         super.onDestroy();
         Log.d(TAG, "onDestroy: ");
     }
+
 
     @Override
     public void onDetach() {
