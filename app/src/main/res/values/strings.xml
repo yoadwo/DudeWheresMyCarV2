@@ -14,5 +14,7 @@
     <string name="camera_button_restore_description">button for restoring last taken photo</string>
     <string name="album_dir">DudeApp</string>
     <string name="uri_provider">com.gingos.dudewheresmycar.fileprovider</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
 
 </resources>

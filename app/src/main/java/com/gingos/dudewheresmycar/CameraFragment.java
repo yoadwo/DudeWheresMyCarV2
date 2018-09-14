@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -33,14 +34,16 @@ import java.util.Date;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class CameraFragment extends Fragment {
+public class CameraFragment extends Fragment implements ConfirmationDialogFragment.ConfirmationDialogListener{
 
     private static final String TAG = "DUDE_camera";
 
     public static final int REQUEST_IMAGE_CAPTURE = 10;
     private static final int STORAGE_PERMISSION_CODE = 21;
+    private static final int CONFIRMATION_DIALOG_TO_CAMERA_FRAGMENT_REQUEST_CODE = 31;
 
     private String mCurrentPhotoPath;
+    private String oldPhotoPath;
     private ImageView imgv_camera_thumbnail;
 
     @Override
@@ -126,7 +129,16 @@ public class CameraFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Log.v(TAG, "onClick: " + "camera take button clicked");
-            dispatchTakePictureIntent();
+            if (mCurrentPhotoPath == null)
+                // no photo was taken in this app run, so no problem to take a new one
+                dispatchTakePictureIntent();
+            else{
+                // photo was taken or restored, we should ask the user if he wants to replace current
+                ConfirmationDialogFragment dialog = new ConfirmationDialogFragment();
+                dialog.show(getFragmentManager(), "ConfirmationDialog");
+                dialog.setTargetFragment(CameraFragment.this, CONFIRMATION_DIALOG_TO_CAMERA_FRAGMENT_REQUEST_CODE);
+            }
+
             /*
             app versioning needed (minSDK is 21
             if(isWriteStorageAllowed())
@@ -217,7 +229,11 @@ public class CameraFragment extends Fragment {
                     break;
                 case RESULT_CANCELED:
                     Log.d(TAG, "onActivityResult: " + "IMAGE_CAPTURE-->RESULT_CANCELED");
-                    mCurrentPhotoPath = null;
+                    mCurrentPhotoPath = oldPhotoPath;
+                    // restore path if user cancelled camera
+                    // only if had photo on screen. if pressed clear then regrets camera - photo is gone.
+                    if (mCurrentPhotoPath != null)
+                        setPic();
                     deleteTempFiles(getContext().getCacheDir());
                     break;
 
@@ -249,11 +265,9 @@ public class CameraFragment extends Fragment {
         int result = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         //If permission is granted returning true
-        if (result == PackageManager.PERMISSION_GRANTED)
-            return true;
+        return result == PackageManager.PERMISSION_GRANTED;
 
         //If permission is not granted returning false
-        return false;
     }
 
     private void requestWriteStoragePermission() {
@@ -279,7 +293,7 @@ public class CameraFragment extends Fragment {
             android.content.pm.PackageManager pm = activityContext.getPackageManager();
             if (pm != null){
                 if (takePictureIntent.resolveActivity(pm) != null) {
-                    File photoFile = null;
+                    File photoFile;
                     try {
                         photoFile = createImageFile();
                     } catch (IOException ex) {
@@ -333,28 +347,57 @@ public class CameraFragment extends Fragment {
     private void setCameraThumbnail() {
         // init photoStateManager instance
         PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getActivity());
+        String loadedPath = photoStateManager.loadPhotoState();
         // no photo was saved when app was started
         if (mCurrentPhotoPath == null){
+            // on new instance of app
             Log.d(TAG, "setCameraThumbnail: " + "mCurrentPhotoPath is null");
-            String loadedPath = photoStateManager.loadPhotoState();
             if (loadedPath != null){
+                // new instance, but on previous app run a photo was saved
                 // restore last photo used
+                Log.d(TAG, "setCameraThumbnail: " + "loadedPath was found on PhotoStateManager, restoring");
                 mCurrentPhotoPath = loadedPath;
                 setPic();
             } else {
+                // new instance, and no photo was saved on previous app run
                 Log.d(TAG, "setCameraThumbnail: " + "no path saved on photoStateManager");
                 Toast.makeText(getContext(),"No photo saved for app",Toast.LENGTH_SHORT).show();
             }
         } else {
+            // app returned from background
             Log.d(TAG, "setCameraThumbnail: " + "mCurrentPhotoPath is not null");
-            promptThumbnailReplace();
-            Toast.makeText(getContext(),"Are you sure you want to replace current photo?",Toast.LENGTH_SHORT).show();
-            //setPic();
+
+            if (loadedPath != null){
+                // some photo is on the thumbnail, user wants saved one
+                //promptThumbnailReplaceDialog();
+                Toast.makeText(getContext(), "Saved photo is already on screen...", Toast.LENGTH_SHORT).show();
+            } else {
+                // no photo was previously saved, and new instance of app
+                // not supposed to happen, because a photo is saved on any exit. just LOG it for now.
+                Log.d(TAG, "setCameraThumbnail: " + "currentPhoto is null, loadedPath is null, somehow got here");
+            }
+
         }
 
     }
 
-    private void promptThumbnailReplace() {
+    private void promptThumbnailReplaceDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new ConfirmationDialogFragment();
+        dialog.show(getFragmentManager(), "ReplaceDialog");
+
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogPositiveClick: ");
+        dispatchTakePictureIntent();
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogNegativeClick: ");
     }
 
 
@@ -373,6 +416,8 @@ public class CameraFragment extends Fragment {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
+        // backup currentPhotoPath in case of camera cancel
+        oldPhotoPath = mCurrentPhotoPath;
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -514,6 +559,5 @@ public class CameraFragment extends Fragment {
         if (mCurrentPhotoPath != null)
             photoStateManager.savePhotoState(mCurrentPhotoPath);
     }
-
-
+    
 }
