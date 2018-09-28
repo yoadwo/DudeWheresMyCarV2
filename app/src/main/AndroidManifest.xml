@@ -18,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/cloud_platform_api_key_dude_app"/>
+
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="@string/uri_provider"

@@ -16,5 +16,6 @@
     <string name="uri_provider">com.gingos.dudewheresmycar.fileprovider</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="cloud_platform_api_key_dude_app">AIzaSyAPur1gJB2in8XVgk7jTJst479fbjhTyUc</string>
 
 </resources>
