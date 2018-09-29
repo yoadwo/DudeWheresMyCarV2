@@ -260,7 +260,6 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
             }
         }
     }
-
     private boolean isWriteStorageAllowed() {
         int result = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 

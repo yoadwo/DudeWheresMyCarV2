@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // set item as selected to persist highlight
         item.setChecked(true);
         // close drawer when item is tapped
-
+        PackageManager packageManager = getPackageManager();
         switch (item.getItemId()){
             case R.id.nav_home:
                 if (homeFragment == null){
@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
             case R.id.nav_photo:
-                PackageManager packageManager = getPackageManager();
                 // do not let user enter the camera fragment if he has not camera
                 if(!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
                     Toast.makeText(MainActivity.this,"This device does not have a camera.", Toast.LENGTH_SHORT).show();
@@ -161,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
             case R.id.nav_navigation:
+                // do not let user enter the camera fragment if he has not camera
                 if (navigationFragment == null){
                     Log.d(TAG, "onNavigationItemSelected: " + "navigation frag was null");
                     navigationFragment = new NavigationFragment();
