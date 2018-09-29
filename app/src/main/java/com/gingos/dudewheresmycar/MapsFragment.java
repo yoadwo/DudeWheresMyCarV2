@@ -2,13 +2,13 @@ package com.gingos.dudewheresmycar;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -33,7 +33,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     //private boolean is_GPSCoarsePermission_granted;
     private boolean is_GPSFinePermission_granted;
-    SupportMapFragment supportMapFragment;
+    private SupportMapFragment supportMapFragment;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -42,16 +42,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
         supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             Log.d(TAG, "onCreateView: has GPS fine location permission");
+            is_GPSFinePermission_granted = true;
             if (supportMapFragment == null){
                 Log.d(TAG, "onCreateView: " + "supportMapFragment was null");
                 supportMapFragment = new SupportMapFragment();
@@ -62,12 +56,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         }else{
             Log.d(TAG, "onCreateView: no permission granted yet for GPS fine location");
+            is_GPSFinePermission_granted = false;
             ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, GPS_FINE_PERMISSION_REQUEST_CODE);
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_maps, container, false);
+
         return v;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Add a marker in Sydney, Australia,
@@ -76,6 +79,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(new MarkerOptions().position(sydney)
                 .title("Marker in Sydney"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        if (is_GPSFinePermission_granted){
+            googleMap.setMyLocationEnabled(true);
+        }
+
+
 
     }
 
