@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/frag_navigation"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_navigation_stub"
@@ -21,11 +20,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" >
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="tv inside image container" />
     </FrameLayout>
 
     <FrameLayout
@@ -36,11 +30,6 @@
         android:layout_below="@id/child_fragment_image_container"
         android:layout_marginTop="0dp" >
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="tv inside map container" />
     </FrameLayout>
 
 </RelativeLayout>

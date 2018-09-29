@@ -14,6 +14,10 @@ public class NavigationFragment extends Fragment {
 
     private static final String TAG = "DUDE_navigation";
 
+    //MapsFragment mapsFragment1;
+    MapsFragment mapsFragment;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -24,13 +28,21 @@ public class NavigationFragment extends Fragment {
     // This event is triggered soon after onCreateView(), only if returned view is non-null.
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        insertNestedFragment();
+        /*
+        if (mapsFragment1 == null)
+            mapsFragment1 = new MapsFragment();
+        insertNestedFragment(R.id.child_fragment_image_container, mapsFragment1);
+        */
+        if (mapsFragment == null)
+            mapsFragment = new MapsFragment();
+        insertNestedFragment(R.id.child_fragment_map_container, mapsFragment);
+
+
     }
 
     // Embeds the child fragment dynamically
-    private void insertNestedFragment() {
-        Fragment childFragment = new MapsFragment();
+    private void insertNestedFragment(int containerID, Fragment fragment) {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.child_fragment_map_container, childFragment).commit();
+        transaction.replace(containerID, fragment).commit();
     }
 }
