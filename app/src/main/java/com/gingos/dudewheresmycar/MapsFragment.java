@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 // with https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
@@ -37,12 +39,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private static final int DEFAULT_ZOOM = 15;
 
-    private boolean _locationPermissionGranted;
-    private SupportMapFragment _supportMapFragment;
-    private GoogleMap _googleMap;
-    private Location _lastKnownLocation; // Last-known location retrieved by the Fused Location Provider.
     private FusedLocationProviderClient _fusedLocationProviderClient; // The entry point to the Fused Location Provider.
-    private final LatLng _defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private Location _lastKnownLocation; // Last-known location retrieved by the Fused Location Provider.
+    private final LatLng _defaultLocation = new LatLng(32.299, -64.79); //Bermuda Triangle
+    private boolean _locationPermissionGranted;
+    //private SupportMapFragment _supportMapFragment;
+    private GoogleMap _googleMap;
+
 
     public MapsFragment() {
         // Required empty public constructor
@@ -52,7 +55,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //build the map
-        _supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment _supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (_supportMapFragment == null){
             Log.d(TAG, "onCreate: " + "supportMapFragment was null");
             _supportMapFragment = new SupportMapFragment();
@@ -70,10 +73,52 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_maps, container, false);
-
-        return v;
+        return inflater.inflate(R.layout.fragment_maps, container, false);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // set views
+        // set buttons
+        ImageButton bt_maps_marker_set = getView().findViewById(R.id.imgb_maps_set);
+        if (bt_maps_marker_set != null)
+            bt_maps_marker_set.setOnClickListener(addMarkerListener);
+        else
+            Log.d(TAG, "onViewCreated: " + "imgb_maps_set view not found (return null)");
+
+        ImageButton bt_maps_marker_clear = getView().findViewById(R.id.imgb_maps_clear);
+        if (bt_maps_marker_clear != null)
+            bt_maps_marker_clear.setOnClickListener(setMarkerListener);
+        else
+            Log.d(TAG, "onViewCreated: " + "imgb_maps_clear view not found (return null)");
+
+    }
+
+    private View.OnClickListener addMarkerListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            markCurrentLocation();
+        }
+    };
+
+    private void markCurrentLocation(){
+        Log.d(TAG, "onClick: " + "add marker clicked");
+        // not checking permission as it is checked with getDeviceLocation
+        getDeviceLocation();
+        _googleMap.addMarker(
+                new MarkerOptions()
+                .title("Your Car Here!")
+                .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+    }
+
+    private View.OnClickListener setMarkerListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "onClick: " + "set marker clicked");
+        }
+    };
 
     @SuppressLint("MissingPermission")
     @Override
@@ -97,32 +142,36 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void permissionRequestCycle_location(){
         if(ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            Log.d(TAG, "onMapReady: " + "permissionRequestCycle_location" + "has GPS fine location permission");
+            Log.d(TAG, "onMapReady: " + " permissionRequestCycle_location: " + "has GPS fine location permission");
             _locationPermissionGranted = true;
 
         }else{
-            Log.d(TAG, "onMapReady: " + "permissionRequestCycle_location" + "no permission granted yet for GPS fine location");
+            Log.d(TAG, "onMapReady: " + " permissionRequestCycle_location: " + "no permission granted yet for GPS fine location");
             _locationPermissionGranted = false;
             ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
 
     }
 
+    // upon permission result, toggle _locationPermissionGranted
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "gps fine permission granted", Toast.LENGTH_SHORT).show();
                 _locationPermissionGranted = true;
-                _supportMapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-                _supportMapFragment.getMapAsync(this);
+                //_supportMapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+                //_supportMapFragment.getMapAsync(this);
             } else {
                 Toast.makeText(getContext(), "gps fine permission denied", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onRequestPermissionsResult: gps fine permission denied");
                 _locationPermissionGranted = false;
             }
         }
+        // according to tutorial. maybe should be removed because it nags the user.
+        updateLocationUI();
     }
 
     // if location permission is granted, add "current location" button to map UI
@@ -154,6 +203,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
          */
         try {
             if (_locationPermissionGranted) {
+                Log.d(TAG, "getDeviceLocation: " + "registering task with OnComplete listener");
                 Task locationResult = _fusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(onCompleteListener);
             }
@@ -167,6 +217,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public void onComplete(@NonNull Task<Location> task) {
             if (task.isSuccessful()) {
+                Log.d(TAG, "onComplete: " + "location task successful");
                 // Set the map's camera position to the current location of the device.
                 _lastKnownLocation = task.getResult();
                 _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -175,6 +226,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             } else {
                 Log.d(TAG, "Current location is null. Using defaults.");
                 Log.e(TAG, "Exception: %s", task.getException());
+                // if task fails, go to default location (bermuda triangle)
+                _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(_defaultLocation, DEFAULT_ZOOM));
+                _googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            }
+        }
+    };
+
+    private OnSuccessListener onSuccessListener = new OnSuccessListener<Location>() {
+        @Override
+        public void onSuccess(Location location) {
+            if (location != null) {
+                _lastKnownLocation = location;
+                _googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude()))
+                .title("current location"));
+            } else {
+                Log.d(TAG, "Current location is null. Using defaults.");
+                // if task fails, go to default location (bermuda triangle)
                 _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(_defaultLocation, DEFAULT_ZOOM));
                 _googleMap.getUiSettings().setMyLocationButtonEnabled(false);
             }

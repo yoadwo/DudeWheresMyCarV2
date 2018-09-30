@@ -87,25 +87,25 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
         if (bt_camera_use !=null){
             bt_camera_use.setOnClickListener(takePhotoListener);
         } else
-            Log.d(TAG, "onViewCreated: " + "bt_camera_use is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_use not found (return null)");
 
         ImageButton bt_camera_share = getView().findViewById(R.id.imgb_camera_share);
         if (bt_camera_share !=null){
             bt_camera_share.setOnClickListener(sharePhotoListener);
         } else
-            Log.d(TAG, "onViewCreated: " + "bt_camera_share is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_share not found (return null)");
 
         ImageButton bt_camera_clear = getView().findViewById(R.id.imgb_camera_clear);
         if (bt_camera_clear !=null){
             bt_camera_clear.setOnClickListener(clearPhotoListener);
         } else
-            Log.d(TAG, "onViewCreated: " + "bt_camera_clear is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_clear not found (return null)");
 
         ImageButton bt_camera_restore = getView().findViewById(R.id.imgb_camera_restore);
         if (bt_camera_restore !=null){
             bt_camera_restore.setOnClickListener(restorePhotoListener);
         } else
-            Log.d(TAG, "onViewCreated: " + "bt_camera_restore is null");
+            Log.d(TAG, "onViewCreated: " + "bt_camera_restore not found (return null)");
 
         // set camera container imageview
         imgv_camera_thumbnail = getView().findViewById(R.id.imgv_camera_thumbnail);
