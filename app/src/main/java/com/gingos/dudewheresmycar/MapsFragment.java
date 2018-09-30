@@ -24,16 +24,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
+// with https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "DUDE_nav_mapFragment";
 
-    private static final int GPS_FINE_PERMISSION_REQUEST_CODE = 100;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
 
-    //private boolean is_GPSCoarsePermission_granted;
-    private boolean is_GPSFinePermission_granted;
-    private SupportMapFragment supportMapFragment;
+    private boolean _locationPermissionGranted;
+    private SupportMapFragment _supportMapFragment;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -42,23 +41,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            Log.d(TAG, "onCreateView: has GPS fine location permission");
-            is_GPSFinePermission_granted = true;
-            if (supportMapFragment == null){
-                Log.d(TAG, "onCreateView: " + "supportMapFragment was null");
-                supportMapFragment = new SupportMapFragment();
-                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-                ft.replace(R.id.map, supportMapFragment).commit();
-            }
-            supportMapFragment.getMapAsync(this);
+        _supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        permissionRequestCycle_location();
 
-        }else{
-            Log.d(TAG, "onCreateView: no permission granted yet for GPS fine location");
-            is_GPSFinePermission_granted = false;
-            ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, GPS_FINE_PERMISSION_REQUEST_CODE);
-        }
     }
 
     @Override
@@ -79,27 +64,47 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(new MarkerOptions().position(sydney)
                 .title("Marker in Sydney"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        if (is_GPSFinePermission_granted){
+        if (_locationPermissionGranted){
             googleMap.setMyLocationEnabled(true);
         }
+    }
 
+    // check-explain-request permission cycle for location
+    // if granted, will get map for the supportMapFragment
+    // if not granted, show dialog
+    private void permissionRequestCycle_location(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "onCreateView: has GPS fine location permission");
+            _locationPermissionGranted = true;
+            if (_supportMapFragment == null){
+                Log.d(TAG, "onCreateView: " + "supportMapFragment was null");
+                _supportMapFragment = new SupportMapFragment();
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.replace(R.id.map, _supportMapFragment).commit();
+            }
+            _supportMapFragment.getMapAsync(this);
 
+        }else{
+            Log.d(TAG, "onCreateView: no permission granted yet for GPS fine location");
+            _locationPermissionGranted = false;
+            ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
 
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == GPS_FINE_PERMISSION_REQUEST_CODE) {
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(getContext(), "gps fine permission granted", Toast.LENGTH_SHORT).show();
-                is_GPSFinePermission_granted = true;
-                supportMapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-                supportMapFragment.getMapAsync(this);
+                _locationPermissionGranted = true;
+                _supportMapFragment= (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+                _supportMapFragment.getMapAsync(this);
             } else {
                 Toast.makeText(getContext(), "gps fine permission denied", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onRequestPermissionsResult: gps fine permission denied");
-                is_GPSFinePermission_granted = false;
+                _locationPermissionGranted = false;
             }
         }
     }

@@ -26,7 +26,7 @@ public class ConfirmationDialogFragment extends DialogFragment {
     }
 
     // Use this instance of the interface to deliver action events
-    ConfirmationDialogListener mListener;
+    ConfirmationDialogListener _listener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -39,13 +39,13 @@ public class ConfirmationDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d(TAG, "onClick: " + "click OK");
-                        mListener.onDialogPositiveClick(ConfirmationDialogFragment.this);
+                        _listener.onDialogPositiveClick(ConfirmationDialogFragment.this);
                     }
                 })
                 .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d(TAG, "onClick: " + "click Cancel");
-                        mListener.onDialogNegativeClick(ConfirmationDialogFragment.this);
+                        _listener.onDialogNegativeClick(ConfirmationDialogFragment.this);
                     }
                 })
                 .setTitle("Replace current photo?");
@@ -62,7 +62,7 @@ public class ConfirmationDialogFragment extends DialogFragment {
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (ConfirmationDialogListener) getTargetFragment();
+            _listener = (ConfirmationDialogListener) getTargetFragment();
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             Log.e(TAG, "onAttach: ClassCastException, must implement ConfirmationDialogListener:" +e.getMessage() );

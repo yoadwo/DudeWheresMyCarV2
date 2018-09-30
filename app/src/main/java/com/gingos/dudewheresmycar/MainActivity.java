@@ -20,11 +20,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String CAMERA_FRAGMENT_TAG = "cameraFragTag";
     private static final String NAVIGATION_FRAGMENT_TAG = "NavFragTag";
 
-    private DrawerLayout mDrawerLayout;
-
-    private HomeFragment homeFragment;
-    private CameraFragment cameraFragment;
-    private NavigationFragment navigationFragment;
+    private DrawerLayout _drawerLayout;
+    private HomeFragment _homeFragment;
+    private CameraFragment _cameraFragment;
+    private NavigationFragment _navigationFragment;
 
 
     @Override
@@ -42,16 +41,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d(TAG, "onCreate: " + "getSupportActionBar return null");
         }
         // set drawer navigation view
-        mDrawerLayout = findViewById(R.id.main_drawer_layout);
+        _drawerLayout = findViewById(R.id.main_drawer_layout);
         // set drawer listener
         NavigationView navigationView = findViewById(R.id.main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // set default fragment is the home fragment
         if (savedInstanceState == null){
-            homeFragment = new HomeFragment();
+            _homeFragment = new HomeFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
-                    homeFragment).commit();
+                    _homeFragment).commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
 
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                _drawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -137,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         PackageManager packageManager = getPackageManager();
         switch (item.getItemId()){
             case R.id.nav_home:
-                if (homeFragment == null){
+                if (_homeFragment == null){
                     Log.d(TAG, "onNavigationItemSelected: " + "home frag was null");
-                    homeFragment = new HomeFragment();
+                    _homeFragment = new HomeFragment();
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
-                     homeFragment).commit();
+                     _homeFragment).commit();
 
                 break;
             case R.id.nav_photo:
@@ -151,25 +150,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Toast.makeText(MainActivity.this,"This device does not have a camera.", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if (cameraFragment == null){
+                if (_cameraFragment == null){
                     Log.d(TAG, "onNavigationItemSelected: " + "camera frag was null");
-                    cameraFragment = new CameraFragment();
+                    _cameraFragment = new CameraFragment();
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
-                    cameraFragment).commit();
+                    _cameraFragment).commit();
 
                 break;
             case R.id.nav_navigation:
                 // do not let user enter the camera fragment if he has not camera
-                if (navigationFragment == null){
+                if (_navigationFragment == null){
                     Log.d(TAG, "onNavigationItemSelected: " + "navigation frag was null");
-                    navigationFragment = new NavigationFragment();
+                    _navigationFragment = new NavigationFragment();
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
-                        navigationFragment).commit();
+                        _navigationFragment).commit();
                 break;
         }
-        mDrawerLayout.closeDrawers();
+        _drawerLayout.closeDrawers();
 
         return true;
     }

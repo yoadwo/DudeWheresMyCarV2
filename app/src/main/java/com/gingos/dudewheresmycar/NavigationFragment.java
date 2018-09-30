@@ -14,9 +14,7 @@ public class NavigationFragment extends Fragment {
 
     private static final String TAG = "DUDE_navigation";
 
-    //MapsFragment mapsFragment1;
-    MapsFragment mapsFragment;
-
+    MapsFragment _mapsFragment;
 
     @Nullable
     @Override
@@ -33,9 +31,9 @@ public class NavigationFragment extends Fragment {
             mapsFragment1 = new MapsFragment();
         insertNestedFragment(R.id.child_fragment_image_container, mapsFragment1);
         */
-        if (mapsFragment == null)
-            mapsFragment = new MapsFragment();
-        insertNestedFragment(R.id.child_fragment_map_container, mapsFragment);
+        if (_mapsFragment == null)
+            _mapsFragment = new MapsFragment();
+        insertNestedFragment(R.id.child_fragment_map_container, _mapsFragment);
 
 
     }
