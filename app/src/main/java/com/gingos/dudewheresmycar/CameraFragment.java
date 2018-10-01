@@ -80,7 +80,7 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d(TAG, "onViewCreated: ");
         // set views
         // set camera use button
         ImageButton bt_camera_use = getView().findViewById(R.id.imgb_camera_use);
@@ -109,7 +109,7 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
 
         // set camera container imageview
         imgv_camera_thumbnail = getView().findViewById(R.id.imgv_camera_thumbnail);
-        Log.d(TAG, "onViewCreated: ");
+
     }
 
     @Override

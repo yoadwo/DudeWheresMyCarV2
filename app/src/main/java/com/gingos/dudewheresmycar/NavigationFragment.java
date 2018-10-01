@@ -31,8 +31,11 @@ public class NavigationFragment extends Fragment {
             mapsFragment1 = new MapsFragment();
         insertNestedFragment(R.id.child_fragment_image_container, mapsFragment1);
         */
-        if (_mapsFragment == null)
+        if (_mapsFragment == null){
+            Log.d(TAG, "onViewCreated: " +"nav_mapsFragment was null");
             _mapsFragment = new MapsFragment();
+        }
+
         insertNestedFragment(R.id.child_fragment_map_container, _mapsFragment);
 
 

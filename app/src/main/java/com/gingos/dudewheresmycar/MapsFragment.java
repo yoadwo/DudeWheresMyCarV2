@@ -3,7 +3,6 @@ package com.gingos.dudewheresmycar;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProvider;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.text.Spannable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +30,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 // with https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
@@ -49,9 +46,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
     private Location _lastKnownLocation; // Last-known location retrieved by the Fused Location Provider.
     private final LatLng _defaultLocation = new LatLng(32.299, -64.79); //Bermuda Triangle
     private boolean _locationPermissionGranted;
-    //private SupportMapFragment _supportMapFragment;
+
     private GoogleMap _googleMap;
     private Marker _parkingMarker;
+    private MarkerOptions _markerOptions;
+
 
 
     public MapsFragment() {
@@ -74,6 +73,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         // Construct a FusedLocationProviderClient.
         _fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
+
     }
 
     @Override
@@ -81,6 +81,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_maps, container, false);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
     }
 
     @Override
@@ -103,6 +110,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
 
     }
 
+
     private View.OnClickListener addMarkerListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -112,14 +120,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
 
     private void markCurrentLocation(){
         Log.d(TAG, "onClick: " + "add marker clicked");
+
         // not checking permission as it is checked with getDeviceLocation
         getDeviceLocation();
 
         if (_parkingMarker == null){
-            _parkingMarker = _googleMap.addMarker(
-                    new MarkerOptions()
-                            .title("Your Car Here!")
-                            .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+            _markerOptions = new MarkerOptions()
+                    .title("Your Car Here!")
+                    .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude()));
+            _parkingMarker = _googleMap.addMarker(_markerOptions);
         }
         else {
             // confirmationDialog
@@ -127,23 +136,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
                     ConfirmationDialogFragment.newInstance
                             (getString(R.string.navigation_map_replace_marker_dialog_title), getString(R.string.navigation_map_replace_marker_dialog_message));
 
-            markerDialog.show(getFragmentManager(), "Camera_ConfirmationDialog");
+            markerDialog.show(getFragmentManager(), "Nav_maps_ConfirmationDialog");
             markerDialog.setTargetFragment(MapsFragment.this, CONFIRMATION_DIALOG_TO_MAP_FRAGMENT_REQUEST_CODE);
 
         }
-
-
     }
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         Log.d(TAG, "onDialogPositiveClick: ");
         // if confirmed new marker
-        _parkingMarker.remove();
-        _parkingMarker = _googleMap.addMarker(
-                new MarkerOptions()
-                        .title("Your Car Here!")
-                        .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+        if (_parkingMarker != null)
+            _parkingMarker.remove();
+        _markerOptions = new MarkerOptions()
+                .title("Your Car Here!")
+                .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude()));
+        _parkingMarker = _googleMap.addMarker(_markerOptions);
     }
 
     @Override
@@ -157,24 +165,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
             Log.d(TAG, "onClick: " + "clear marker clicked");
             if (_parkingMarker != null)
                 _parkingMarker.remove();
+            if (_markerOptions != null)
+                _markerOptions = null;
         }
     };
-
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        Log.d(TAG, "onMapReady: ");
-        _googleMap = googleMap;
-        // Prompt the user for permission.
-        permissionRequestCycle_location();
-
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
-
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
-    }
 
     // check-explain-request permission cycle for location
     // if granted, will get map for the supportMapFragment
@@ -214,6 +208,33 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         updateLocationUI();
     }
 
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        Log.d(TAG, "onMapReady: ");
+        _googleMap = googleMap;
+
+        // it is possible that a map was re-drawn and still holds a marker reference
+        // if so, remove it and put it back again (it is not possible to just make it reappear)
+        if (_parkingMarker != null){
+            _parkingMarker.remove();
+            if (_markerOptions != null){
+                _parkingMarker = _googleMap.addMarker(_markerOptions);
+                _googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(_parkingMarker.getPosition(), DEFAULT_ZOOM));
+            }
+        }
+        // Prompt the user for permission.
+        permissionRequestCycle_location();
+
+        // Turn on the My Location layer and the related control on the map.
+        updateLocationUI();
+
+        // Get the current location of the device and set the position of the map.
+        getDeviceLocation();
+
+    }
+
     // if location permission is granted, add "current location" button to map UI
     // if not granted, ask for it
     private void updateLocationUI(){
@@ -235,7 +256,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         }
     }
 
-    // ASYNC - use fusedLocations to retrieve device location
+    // ASYNC - use fusedLocations to retrieve device location and move camera there(!)
     private void getDeviceLocation(){
         /*
          * Get the best and most recent location of the device, which may be null in rare
