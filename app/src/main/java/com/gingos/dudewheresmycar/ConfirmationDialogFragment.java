@@ -16,6 +16,10 @@ import android.util.Log;
 public class ConfirmationDialogFragment extends DialogFragment {
 
     private static final String TAG = "DUDE_ConfirmationDialog";
+    private static final String ARG_TITLE = "title";
+    private static final String ARG_DEFAULT_TITLE = "<Title>";
+    private static final String ARG_MESSAGE = "message";
+    private static final String ARG_DEFAULT_MESSAGE = "<Message>?";
 
     /* The activity that creates an instance of this dialog fragment must
      * implement this interface in order to receive event callbacks.
@@ -23,6 +27,18 @@ public class ConfirmationDialogFragment extends DialogFragment {
     public interface ConfirmationDialogListener {
         void onDialogPositiveClick(DialogFragment dialog);
         void onDialogNegativeClick(DialogFragment dialog);
+    }
+
+    public static ConfirmationDialogFragment newInstance(String title, String message) {
+
+        ConfirmationDialogFragment frag = new ConfirmationDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_MESSAGE, message);
+        frag.setArguments(args);
+
+        return frag;
     }
 
     // Use this instance of the interface to deliver action events
@@ -33,9 +49,11 @@ public class ConfirmationDialogFragment extends DialogFragment {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
+        String title = getArguments().getString(ARG_TITLE, ARG_DEFAULT_TITLE);
+        String message = getArguments().getString(ARG_MESSAGE, ARG_DEFAULT_MESSAGE);
 
-        builder.setMessage("By taking a new photo now you will not be able to restore the current one "
-                + "(You could still access it from directly from file manager).  Proceed?")
+
+        builder.setMessage(message)
                 .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d(TAG, "onClick: " + "click OK");
@@ -48,7 +66,7 @@ public class ConfirmationDialogFragment extends DialogFragment {
                         _listener.onDialogNegativeClick(ConfirmationDialogFragment.this);
                     }
                 })
-                .setTitle("Replace current photo?");
+                .setTitle(title);
 
         // Create the AlertDialog object and return it
         return builder.create();

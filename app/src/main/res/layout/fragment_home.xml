@@ -15,11 +15,12 @@
         android:textSize="30sp" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/img_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tv_home_stub"
         android:layout_alignParentStart="true"
+        android:contentDescription="@string/home_image_logo_description"
         app:srcCompat="@drawable/dude_full_logo" />
 
 </RelativeLayout>

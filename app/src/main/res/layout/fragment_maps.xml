@@ -13,8 +13,7 @@
         android:layout_height="342dp"
         android:layout_above="@id/imgb_maps_set"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        tools:layout="@layout/map_fragment_preview" />
+        android:layout_alignParentTop="true" />
 
 
     <ImageButton
