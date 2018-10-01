@@ -133,9 +133,12 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
                 dispatchTakePictureIntent();
             else{
                 // photo was taken or restored, we should ask the user if he wants to replace current
-                ConfirmationDialogFragment dialog = new ConfirmationDialogFragment();
-                dialog.show(getFragmentManager(), "ConfirmationDialog");
-                dialog.setTargetFragment(CameraFragment.this, CONFIRMATION_DIALOG_TO_CAMERA_FRAGMENT_REQUEST_CODE);
+                ConfirmationDialogFragment cameraDialog =
+                        ConfirmationDialogFragment.newInstance
+                                (getString(R.string.camera_replace_photo_dialog_title), getString(R.string.camera_replace_photo_dialog_message));
+
+                cameraDialog.show(getFragmentManager(), "Camera_ConfirmationDialog");
+                cameraDialog.setTargetFragment(CameraFragment.this, CONFIRMATION_DIALOG_TO_CAMERA_FRAGMENT_REQUEST_CODE);
             }
 
             /*
