@@ -3,15 +3,18 @@ package com.gingos.dudewheresmycar;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModelProvider;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,15 +29,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 // with https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, ConfirmationDialogFragment.ConfirmationDialogListener {
 
     private static final String TAG = "DUDE_nav_mapFragment";
+
+    private static final int CONFIRMATION_DIALOG_TO_MAP_FRAGMENT_REQUEST_CODE = 200;
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private static final int DEFAULT_ZOOM = 15;
@@ -45,6 +51,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private boolean _locationPermissionGranted;
     //private SupportMapFragment _supportMapFragment;
     private GoogleMap _googleMap;
+    private Marker _parkingMarker;
 
 
     public MapsFragment() {
@@ -90,7 +97,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         ImageButton bt_maps_marker_clear = getView().findViewById(R.id.imgb_maps_clear);
         if (bt_maps_marker_clear != null)
-            bt_maps_marker_clear.setOnClickListener(setMarkerListener);
+            bt_maps_marker_clear.setOnClickListener(clearMarkerListener);
         else
             Log.d(TAG, "onViewCreated: " + "imgb_maps_clear view not found (return null)");
 
@@ -107,16 +114,49 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "onClick: " + "add marker clicked");
         // not checking permission as it is checked with getDeviceLocation
         getDeviceLocation();
-        _googleMap.addMarker(
-                new MarkerOptions()
-                .title("Your Car Here!")
-                .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+
+        if (_parkingMarker == null){
+            _parkingMarker = _googleMap.addMarker(
+                    new MarkerOptions()
+                            .title("Your Car Here!")
+                            .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+        }
+        else {
+            // confirmationDialog
+            ConfirmationDialogFragment markerDialog =
+                    ConfirmationDialogFragment.newInstance
+                            (getString(R.string.navigation_map_replace_marker_dialog_title), getString(R.string.navigation_map_replace_marker_dialog_message));
+
+            markerDialog.show(getFragmentManager(), "Camera_ConfirmationDialog");
+            markerDialog.setTargetFragment(MapsFragment.this, CONFIRMATION_DIALOG_TO_MAP_FRAGMENT_REQUEST_CODE);
+
+        }
+
+
     }
 
-    private View.OnClickListener setMarkerListener = new View.OnClickListener() {
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogPositiveClick: ");
+        // if confirmed new marker
+        _parkingMarker.remove();
+        _parkingMarker = _googleMap.addMarker(
+                new MarkerOptions()
+                        .title("Your Car Here!")
+                        .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude())));
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Log.d(TAG, "onDialogNegativeClick: ");
+    }
+
+    private View.OnClickListener clearMarkerListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "onClick: " + "set marker clicked");
+            Log.d(TAG, "onClick: " + "clear marker clicked");
+            if (_parkingMarker != null)
+                _parkingMarker.remove();
         }
     };
 
@@ -206,6 +246,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 Log.d(TAG, "getDeviceLocation: " + "registering task with OnComplete listener");
                 Task locationResult = _fusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(onCompleteListener);
+
             }
         } catch(SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -217,14 +258,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public void onComplete(@NonNull Task<Location> task) {
             if (task.isSuccessful()) {
-                Log.d(TAG, "onComplete: " + "location task successful");
+                Log.d(TAG, "onCompleteListener, " + "onComplete: " + "location task successful");
                 // Set the map's camera position to the current location of the device.
                 _lastKnownLocation = task.getResult();
                 _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(_lastKnownLocation.getLatitude(),
                                 _lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
             } else {
-                Log.d(TAG, "Current location is null. Using defaults.");
+                Log.d(TAG, "onCompleteListener, " + "onComplete: " + "location task unsuccessful");
                 Log.e(TAG, "Exception: %s", task.getException());
                 // if task fails, go to default location (bermuda triangle)
                 _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(_defaultLocation, DEFAULT_ZOOM));
@@ -233,20 +274,5 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     };
 
-    private OnSuccessListener onSuccessListener = new OnSuccessListener<Location>() {
-        @Override
-        public void onSuccess(Location location) {
-            if (location != null) {
-                _lastKnownLocation = location;
-                _googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(_lastKnownLocation.getLatitude(), _lastKnownLocation.getLongitude()))
-                .title("current location"));
-            } else {
-                Log.d(TAG, "Current location is null. Using defaults.");
-                // if task fails, go to default location (bermuda triangle)
-                _googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(_defaultLocation, DEFAULT_ZOOM));
-                _googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-            }
-        }
-    };
+
 }
