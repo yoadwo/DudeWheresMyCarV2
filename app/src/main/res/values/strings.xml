@@ -23,14 +23,14 @@
     <string name="album_dir">DudeApp</string>
     <string name="uri_provider">com.gingos.dudewheresmycar.fileprovider</string>
     <string name="camera_replace_photo_dialog_title">Replace current photo?</string>
-    <string name="camera_replace_photo_dialog_message">By taking a new photo now you will not be able to restore the current one
-                (You could still access it from file manager).  Proceed?</string>
+    <string name="camera_replace_photo_dialog_message">Take a new photo and lose the displayed one?\n
+        You could still access it from file manager.</string>
         <!-- NAVIGATION FRAGMENT -->
     <string name="navigation_txt_stub">Navigation Fragment</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_button_set_marker_description">button for setting marker at current location</string>
     <string name="navigation_button_clear_marker_description">button for clearing marker</string>
     <string name="navigation_map_replace_marker_dialog_title">Replace current marker?</string>
-    <string name="navigation_map_replace_marker_dialog_message">By placing a new marker now you will lose the current location. Proceed?</string>
+    <string name="navigation_map_replace_marker_dialog_message">Save a new marker and lose the display one?</string>
 
 </resources>
