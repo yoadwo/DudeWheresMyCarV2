@@ -111,7 +111,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
     }
 
 
-    private View.OnClickListener addMarkerListener = new View.OnClickListener() {
+    private final View.OnClickListener addMarkerListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             markCurrentLocation();
@@ -131,15 +131,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
             _parkingMarker = _googleMap.addMarker(_markerOptions);
         }
         else {
-            // confirmationDialog
-            ConfirmationDialogFragment markerDialog =
-                    ConfirmationDialogFragment.newInstance
-                            (getString(R.string.navigation_map_replace_marker_dialog_title), getString(R.string.navigation_map_replace_marker_dialog_message));
-
-            markerDialog.show(getFragmentManager(), "Nav_maps_ConfirmationDialog");
-            markerDialog.setTargetFragment(MapsFragment.this, CONFIRMATION_DIALOG_TO_MAP_FRAGMENT_REQUEST_CODE);
-
+            showConfirmationDialog();
         }
+    }
+
+    private void showConfirmationDialog() {
+        ConfirmationDialogFragment markerDialog =
+                ConfirmationDialogFragment.newInstance
+                        (getString(R.string.navigation_map_replace_marker_dialog_title), getString(R.string.navigation_map_replace_marker_dialog_message));
+
+        markerDialog.show(getFragmentManager(), "Nav_maps_ConfirmationDialog");
+        markerDialog.setTargetFragment(MapsFragment.this, CONFIRMATION_DIALOG_TO_MAP_FRAGMENT_REQUEST_CODE);
     }
 
     @Override
@@ -159,14 +161,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         Log.d(TAG, "onDialogNegativeClick: ");
     }
 
-    private View.OnClickListener clearMarkerListener = new View.OnClickListener() {
+    private final View.OnClickListener clearMarkerListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "onClick: " + "clear marker clicked");
-            if (_parkingMarker != null)
+            if (_parkingMarker != null){
                 _parkingMarker.remove();
+                _parkingMarker = null;
+            }
+
             if (_markerOptions != null)
                 _markerOptions = null;
+
+            if (_googleMap != null)
+                _googleMap.clear();
         }
     };
 
@@ -275,7 +283,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
 
     }
 
-    private OnCompleteListener onCompleteListener = new OnCompleteListener<Location>() {
+    private final OnCompleteListener onCompleteListener = new OnCompleteListener<Location>() {
         @Override
         public void onComplete(@NonNull Task<Location> task) {
             if (task.isSuccessful()) {
