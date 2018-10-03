@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+
 public class PhotoStateManager {
 
     private static final String TAG = "DUDE_photoStateManager";
@@ -11,6 +12,8 @@ public class PhotoStateManager {
     private final String PREFERENCES_PHOTO = getClass().getPackage() + "_photoPreferences";
     private final String CHANGED = "changed";
     private final String LAST_PATH = "LastPath";
+    private final String LAST_WIDTH = "LastWidth";
+    private final String Last_HEIGHT = "LastHeight";
 
     private SharedPreferences _photoStatePrefs;
     private static PhotoStateManager _instance;
@@ -40,15 +43,41 @@ public class PhotoStateManager {
         }
     }
 
-    public String loadPhotoState(){
+    public void savePhotoState(String path, int width, int height){
+        SharedPreferences.Editor photoEditor = _photoStatePrefs.edit();
+        if (path != null){
+            Log.d(TAG, "savePhotoState: " + " saving path.");
+            photoEditor.putString(LAST_PATH, path);
+            photoEditor.apply();
+        }
+
+        if (width != 0 && height != 0){
+            Log.d(TAG, "savePhotoState: " + "saving width and height");
+            photoEditor.putInt(LAST_WIDTH, width);
+            photoEditor.putInt(Last_HEIGHT, height);
+            photoEditor.apply();
+        }
+    }
+
+
+    public String loadPhotoStatePath(){
         String filePath = _photoStatePrefs.getString(LAST_PATH, null);
         if (filePath != null){
-            Log.d(TAG, "loadPhotoState: " + " path found at sharedPreferences");
+            Log.d(TAG, "loadPhotoStatePath: " + " path found at sharedPreferences");
         }
         else {
-            Log.d(TAG, "loadPhotoState: " + " no path found at sharedPreferences ");
+            Log.d(TAG, "loadPhotoStatePath: " + " no path found at sharedPreferences ");
         }
         return filePath;
+    }
+
+    public int[] loadPhotoStateMeasurements(){
+        int[] measurements = new int[2];
+        int width = _photoStatePrefs.getInt(LAST_WIDTH, -1);
+        int height = _photoStatePrefs.getInt(Last_HEIGHT, -1);
+        measurements[0] = width;
+        measurements[1] = height;
+        return measurements;
     }
 
 
