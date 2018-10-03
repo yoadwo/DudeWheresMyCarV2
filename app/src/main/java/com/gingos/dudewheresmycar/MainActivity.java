@@ -142,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
                      _homeFragment).commit();
-
                 break;
+
             case R.id.nav_photo:
                 // do not let user enter the camera fragment if he has not camera
                 if(!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.main_content_frame,
                     _cameraFragment).commit();
-
                 break;
+
             case R.id.nav_navigation:
                 // do not let user enter the camera fragment if he has not camera
                 if (_navigationFragment == null){
