@@ -1,4 +1,4 @@
-package com.gingos.dudewheresmycar;
+package com.gingos.dudewheresmycar.StateManagers;
 
 import android.content.Context;
 import android.content.SharedPreferences;

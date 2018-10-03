@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.gingos.dudewheresmycar.Dialogs.ConfirmationDialogFragment;
+import com.gingos.dudewheresmycar.StateManagers.MapStateManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -83,12 +85,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         return inflater.inflate(R.layout.fragment_maps, container, false);
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
-    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -223,15 +219,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
         Log.d(TAG, "onMapReady: ");
         _googleMap = googleMap;
 
-        // it is possible that a map was re-drawn and still holds a marker reference
-        // if so, remove it and put it back again (it is not possible to just make it reappear)
-        if (_parkingMarker != null){
-            _parkingMarker.remove();
-            if (_markerOptions != null){
-                _parkingMarker = _googleMap.addMarker(_markerOptions);
-                _googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(_parkingMarker.getPosition(), DEFAULT_ZOOM));
-            }
-        }
+        //TODO
+        setMapMarker();
+        
         // Prompt the user for permission.
         permissionRequestCycle_location();
 
@@ -302,6 +292,56 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Confir
             }
         }
     };
+
+    private void setMapMarker(){
+        Log.d(TAG, "setMapMarker: ");
+        if (_parkingMarker != null){
+            Log.d(TAG, "setMapMarker: " + "_parkingMarker is not null");
+            // app came either from background or from another fragment
+            redrawMarker();
+        }
+        else {
+            Log.d(TAG, "setMapMarker: " + "_parkingMarker is null");
+            MapStateManager mapStateManager = MapStateManager.getInstance(getContext());
+            MarkerOptions loadedMarkerOptions = mapStateManager.loadMapState();
+            if (loadedMarkerOptions != null){
+                // new app lifecycle, but not the first one
+                // so a photo was likely to be taken
+                Log.d(TAG, "setMapMarker: " + "loadedMarkerOptions was found on ,mapStateManager, restoring");
+                _markerOptions = loadedMarkerOptions;
+                redrawMarker();
+            }
+            else {
+                // new app lifecycle, with no photo previously taken
+                Log.d(TAG, "setMapMarker: " + "no markerOptions saved on mapStateManager");
+                Toast.makeText(getContext(),"No marker exists for app",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    public void redrawMarker(){
+        if (_parkingMarker != null)
+            _parkingMarker.remove();
+        if (_markerOptions != null){
+            _parkingMarker = _googleMap.addMarker(_markerOptions);
+            _googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(_parkingMarker.getPosition(), DEFAULT_ZOOM));
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: " + "saving map state");
+        saveMapState();
+    }
+
+    private void saveMapState() {
+        MapStateManager mapStateManager = MapStateManager.getInstance(getContext());
+
+        if (_parkingMarker != null) {
+            mapStateManager.saveMapState(_parkingMarker.getTitle(), _parkingMarker.getPosition());
+        }
+    }
 
 
 }

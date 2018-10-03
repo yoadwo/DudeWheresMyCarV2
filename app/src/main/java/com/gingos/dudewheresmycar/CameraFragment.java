@@ -24,6 +24,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.gingos.dudewheresmycar.Dialogs.ConfirmationDialogFragment;
+import com.gingos.dudewheresmycar.StateManagers.PhotoStateManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -174,7 +177,7 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
     }
 
     private void savePhotoState(){
-        PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getActivity());
+        PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getContext());
         // mCurrentPhotoPath could be null, but that's a waste of resources to save it anyway
         if (_currentPhotoPath != null) {
             photoStateManager.savePhotoState(_currentPhotoPath, _currentWidth, _currentHeight);
@@ -491,7 +494,8 @@ public class CameraFragment extends Fragment implements ConfirmationDialogFragme
                 targetH = _currentHeight;
             } else {
                 // 2. try to restore from previous life cycle
-                int[] measurements = PhotoStateManager.getInstance(getContext()).loadPhotoStateMeasurements();
+                PhotoStateManager photoStateManager = PhotoStateManager.getInstance(getContext());
+                int[] measurements = photoStateManager.loadPhotoStateMeasurements();
                 targetW = measurements[0];
                 targetH = measurements[1];
             }
